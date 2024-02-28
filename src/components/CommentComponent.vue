@@ -2,7 +2,7 @@
  * @Author: Little Weak_Duck
  * @Date: 2024-02-25 12:03:25
  * @LastEditors: Little Weak_Duck
- * @LastEditTime: 2024-02-26 11:13:51
+ * @LastEditTime: 2024-02-28 22:20:02
  * @FilePath: /src/components/CommentComponent.vue
  * @Description:  comment component
 -->
@@ -15,7 +15,7 @@
         <div class="comment">
             <div class="header">
                 <h3 class="title">{{ comment.title }}</h3>
-                <div>{{ isChild ? comment.author : comment.updateAt.toLocaleString() }}</div>
+                <div>{{ isChild ? comment.author : comment.updatedAt.toLocaleString() }}</div>
             </div>
             <Divider v-if="comment.parent" />
             <div v-if="comment.parent" class="child">
@@ -24,9 +24,9 @@
             <Divider v-else />
             <p class="content">{{ comment.content }}</p>
         <div class="button-ctn" >
-            <span v-if="isChild">{{ comment.updateAt.toLocaleString() }}</span>
-            <MyButton v-else class="button" type="primary">Reply</MyButton>
-            <MyButton v-if="isAdmin" class="button" type="danger">Delete</MyButton>
+            <span v-if="isChild">{{ comment.updatedAt.toLocaleString() }}</span>
+            <MyButton v-else class="button" type="primary" @click="clickReply">Reply</MyButton>
+            <MyButton v-if="isAdmin" class="button" type="danger" @click="clickDelete">Delete</MyButton>
         </div>
         </div>
     </div>
@@ -38,7 +38,7 @@ import type { Comment } from '@/types/comment'
 import Divider from './Divider.vue';
 import MyButton from './MyButton.vue';
 
-defineProps({
+const props = defineProps({
     comment: {
         type: Object as PropType<Comment>,
         required: true
@@ -52,6 +52,17 @@ defineProps({
         default: false
     }
 })
+
+const emits = defineEmits(['reply', 'delete'])
+
+const clickReply = () => {
+    emits('reply', props.comment.id)
+}
+
+const clickDelete = () => {
+    emits('delete', props.comment.id)
+}
+
 </script>
 
 <style scoped>
