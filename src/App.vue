@@ -11,7 +11,7 @@
   <main>
     <!-- <TheWelcome /> -->
     <Divider class="divider-width" />
-    <div class="comment-list" @scroll="checkScroll">
+    <div class="comment-list" @scroll="debounceCheckScroll">
       <CommentComponent v-for="(comment, index) in comments" :comment="comment" :isAdmin="isAdmin" :key="index"
         @delete="deleteComment" @reply="replayComment" />
       <h1 v-if="comments.length === 0">暂无留言</h1>
@@ -46,6 +46,7 @@ import MyButton from './components/MyButton.vue';
 import { onMounted, onUnmounted, ref } from 'vue';
 import Dialog from './components/Dialog.vue';
 import api from './api';
+import debounce from './utils/debounce';
 
 const adminPassword = ref("")
 const showInputPassword = ref(false)
@@ -95,14 +96,14 @@ const size = ref(10)
 onMounted(async () => {
   const appElement = document.getElementById('app');
   if (appElement) {
-    appElement.addEventListener('scroll', () => checkScroll(undefined));
+    appElement.addEventListener('scroll', () => debounceCheckScroll(undefined));
   }
   getCommentList()
 })
 onUnmounted(() => {
   const appElement = document.getElementById('app');
   if (appElement) {
-    appElement.removeEventListener('scroll', () => checkScroll(undefined));
+    appElement.removeEventListener('scroll', () => debounceCheckScroll(undefined));
   }
 })
 
@@ -120,7 +121,8 @@ const getCommentList = async () => {
       }
       return item;
     })];
-    shouldGetMore.value = res.data.data.data.length <= size.value * page.value
+    shouldGetMore.value = res.data.data.total >= size.value * page.value
+          console.log("🚀 ~ comments.value=[...comments.value,...res.data.data.data.map ~ comments.value:", comments.value.length)
 
   } catch (error) {
     console.error(error)
@@ -146,7 +148,9 @@ const createComment = async () => {
     messageTitle.value = ""
     author.value = localStorage.getItem("AUTHOR") || ""
     parentId.value = undefined
-    comments.value = [...comments.value, res.data.data]
+    let comment = res.data.data
+    comment.updatedAt = new Date(Number(comment.updatedAt))
+    comments.value = [...comments.value, comment]
     shouldClear.value = true
   } catch (error) {
     console.error(error)
@@ -173,6 +177,9 @@ const checkScroll = (event?: UIEvent) => {
     getCommentList()
   }
 }
+
+const debounceCheckScroll = debounce(checkScroll, 100)
+
 
 const deleteComment = async (id: number) => {
   try {
