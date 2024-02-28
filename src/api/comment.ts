@@ -2,7 +2,7 @@
  * @Author: Little Weak_Duck
  * @Date: 2024-02-28 22:43:03
  * @LastEditors: Little Weak_Duck
- * @LastEditTime: 2024-02-28 23:20:40
+ * @LastEditTime: 2024-02-28 23:52:51
  * @FilePath: /src/api/comment.ts
  * @Description:  comment.ts
  */
@@ -15,7 +15,7 @@ const getCommentList = (params: { page?: number, size?: number }) => {
 }
 
 const createComment = (data:{content:string,title:string,author:string,parentId?:number}) => {
-    return instance.get(`/comments}`, {data})
+    return instance.post<ResponseBody<Comment>>(`/comments`, data)
 }
 
 const deleteComment = (id: number) => {

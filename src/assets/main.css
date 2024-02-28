@@ -7,6 +7,7 @@
   font-weight: normal;
   height: 100vh;
   box-sizing: border-box;
+  overflow-y: scroll;
 }
 
 a,
@@ -33,5 +34,6 @@ a,
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
+    overflow-y: hidden;
   }
 }
